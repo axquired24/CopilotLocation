@@ -7,6 +7,12 @@
         <span class="page">Dashboard</span>
       </a>
     </router-link>
+    <router-link tag="li" class="pageLink" to="/maps">
+      <a>
+        <i class="fa fa-sitemap"></i>
+        <span class="page">Maps</span>
+      </a>
+    </router-link>
     <router-link tag="li" class="pageLink" to="/tables">
       <a>
         <i class="fa fa-table"></i>

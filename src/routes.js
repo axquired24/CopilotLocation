@@ -10,6 +10,7 @@ import SettingView from './components/views/Setting.vue'
 import AccessView from './components/views/Access.vue'
 import ServerView from './components/views/Server.vue'
 import ReposView from './components/views/Repos.vue'
+import MapsPage from '@/components/pages/Maps.vue'
 
 // Routes
 const routes = [
@@ -56,7 +57,16 @@ const routes = [
         path: 'repos',
         component: ReposView,
         name: 'Repository',
-        meta: {description: 'List of popular javascript repos'}
+        meta: {
+          description: 'List of popular javascript repos'
+        }
+      }, {
+        path: 'maps',
+        component: MapsPage,
+        name: 'Maps',
+        meta: {
+          description: 'Search location realtime'
+        }
       }
     ]
   }, {
