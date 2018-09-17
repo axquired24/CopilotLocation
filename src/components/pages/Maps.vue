@@ -2,11 +2,7 @@
     <section class="content">
         <div class="row">
             <div class="col-md-3">
-                <div class="box box-warning">
-                    <div class="box-header">
-                        <h3 class="box-title">Location</h3>
-                    </div>
-                </div>
+                <FilterLocation></FilterLocation>
             </div>
             <div class="col-md-9"></div>
         </div>
@@ -14,5 +10,12 @@
 </template>
 
 <script>
-    
+    import FilterLocation from '@/components/base/FilterLocation.vue'
+
+    export default {
+        name: 'Maps',
+        components: {
+            FilterLocation
+        }
+    }
 </script>
