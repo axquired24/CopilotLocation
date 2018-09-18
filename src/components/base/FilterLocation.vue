@@ -75,7 +75,7 @@
       citySelected() {
         //console.log("city Location Changed")
         let currentLoc = this.currentLocation(this)
-        console.log(currentLoc)
+        console.log(_.map(currentLoc, v => {return v.label}))
       }
     },
     methods: {
