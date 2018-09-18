@@ -43,27 +43,39 @@
       this.loadStateLocation(this)
     },
     computed: {
-        stateLocationVal() {
+        stateLocationSelected() {
           return this.stateLocation.selected
         },
-        regionVal() {
+        regionSelected() {
             return this.region.selected
         },
-        cityVal() {
+        citySelected() {
             return this.city.selected
         }
     },
     watch: {
-      stateLocationVal() {
-        console.log("State Location Changed")
-        this.loadRegion(this)
+      stateLocationSelected() {
+        // console.log("State Location Changed")
+        // jika parent location == DEFAULT_OPTION[0] (semua), maka reset current value
+        if(this.stateLocation.selected == DEFAULT_OPTION[0]) {
+          this.resetRegion(this)
+        } else {
+          this.loadRegion(this)
+        }
       },
-      regionVal() {
-        console.log("region Changed")
-        this.loadCity(this)
+      regionSelected() {
+        // console.log("region Changed")
+        // jika current location == DEFAULT_OPTION[0] (semua), maka reset child location
+        if(this.region.selected == DEFAULT_OPTION[0]) {
+          this.resetCity(this)
+        } else {
+          this.loadCity(this)
+        }
       },
-      cityVal() {
-        console.log("city Location Changed")
+      citySelected() {
+        //console.log("city Location Changed")
+        let currentLoc = this.currentLocation(this)
+        console.log(currentLoc)
       }
     },
     methods: {
@@ -80,6 +92,22 @@
           stateLocation: self.stateLocation.selected.val,
           region: self.region.selected.val
         })
+      },
+      resetStateLocation: (self) => {
+        self.stateLocation.resetData(self.stateLocation)
+      },
+      resetRegion: (self) => {
+        self.region.resetData(self.region)
+      },
+      resetCity: (self) => {
+        self.city.resetData(self.city)
+      },
+      currentLocation: (self) => {
+        return {
+          stateLocation: self.stateLocationSelected,
+          region: self.regionSelected,
+          city: self.citySelected
+        }
       }
     } // / methods
   }

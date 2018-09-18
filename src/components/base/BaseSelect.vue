@@ -10,7 +10,7 @@
 <script>
   import {DEFAULT_OPTION} from '@/helper/general'
   const axios = require('axios')
-  // const _ = require('lodash')
+  const _ = require('lodash')
 
   export default {
     name: 'BaseSelect',
@@ -39,6 +39,7 @@
         })
         .then((resp) => {
           let opts = self.toLabelVal(resp.data)
+          opts = _.concat(opts, DEFAULT_OPTION[0])
 
           self.opts = opts
           self.selected = opts[0]
@@ -46,6 +47,10 @@
         .catch((err) => {
           console.log(err)
         })
+      },
+      resetData: (self) => {
+        self.opts = DEFAULT_OPTION,
+        self.selected = DEFAULT_OPTION[0]
       },
       toLabelVal: function(idNameFormat) {
         let ret = _.map(idNameFormat, (v) => {
