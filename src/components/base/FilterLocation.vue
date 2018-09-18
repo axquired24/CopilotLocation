@@ -4,9 +4,9 @@
           <h3 class="box-title">Location</h3>
       </div>
       <div class="box-body">
-          <BaseSelect title="State" :opts="stateLocation.opts" :selected="stateLocation.selected" ref="StateFilter"></BaseSelect>
-          <BaseSelect title="Region" :opts="region.opts" :selected="region.selected" ref="RegionFilter"></BaseSelect>
-          <BaseSelect title="City" :opts="city.opts" :selected="city.selected" ref="CityFilter"></BaseSelect>
+          <BaseSelect title="State" ref="StateFilter"></BaseSelect>
+          <BaseSelect title="Region" ref="RegionFilter"></BaseSelect>
+          <BaseSelect title="City" ref="CityFilter"></BaseSelect>
       </div>
   </div>
 </template>
@@ -17,89 +17,69 @@
 
   const axios = require('axios')
   const _ = require('lodash')
-  const basepath = 'https://api.mockaroo.com/api/42f8ee20?count=10&key=6c398fb0'
-  const defaultLocation = {val: '', label: 'Select parent location...'}
+  // const basepath = 'https://api.mockaroo.com/api/42f8ee20?count=10&key=6c398fb0'
+  const basepath = 'https://api.myjson.com/bins/16izaw'
+  const defaultOptionObj = {
+    opt: DEFAULT_OPTION,
+    selected: DEFAULT_OPTION[0]
+  }
 
   export default {
     name: 'FilterLocation',
-    data: () => {
-      return {
-        stateLocation: {
-          opts: DEFAULT_OPTION,
-          selected: DEFAULT_OPTION[0]
-        },
-        region: {
-          opts: [defaultLocation],
-          selected: defaultLocation
-        },
-        city: {
-          opts: [defaultLocation],
-          selected: defaultLocation
-        }
-      }
-    },
     components: {
       BaseSelect
     },
+    data: () => {
+      return {
+        stateLocation: defaultOptionObj,
+        region: defaultOptionObj,
+        city: defaultOptionObj
+      }
+    },
     mounted() {
-      this.loadState(this)
+      this.stateLocation = this.$refs.StateFilter
+      this.region = this.$refs.RegionFilter
+      this.city = this.$refs.CityFilter
+      this.loadStateLocation(this)
+    },
+    computed: {
+        stateLocationVal() {
+          return this.stateLocation.selected
+        },
+        regionVal() {
+            return this.region.selected
+        },
+        cityVal() {
+            return this.city.selected
+        }
+    },
+    watch: {
+      stateLocationVal() {
+        console.log("State Location Changed")
+        this.loadRegion(this)
+      },
+      regionVal() {
+        console.log("region Changed")
+        this.loadCity(this)
+      },
+      cityVal() {
+        console.log("city Location Changed")
+      }
     },
     methods: {
-      loadState: (self) => {
-        axios.get(basepath, {
-          params: {}
-        })
-        .then((resp) => {
-          let opts = self.toLabelVal(resp.data)
-
-          self.stateLocation.opts = opts
-          self.stateLocation.selected = opts[0]
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      loadStateLocation: (self) => {
+        self.stateLocation.loadData(self.stateLocation, basepath, {})
       },
-
       loadRegion: (self) => {
-        axios.get(basepath, {
-          params: {
-            state: self.stateLocation.selected.val
-            }
-        })
-        .then((resp) => {
-          let opts = self.toLabelVal(resp.data)
-
-          self.region.opts = opts
-          self.region.selected = opts[0]
-        })
-        .catch((err) => {
-          console.log(err)
+        self.region.loadData(self.region, basepath, {
+          stateLocation: self.stateLocation.selected.val
         })
       },
-
       loadCity: (self) => {
-        axios.get(basepath, {
-          params: {
-            state: self.stateLocation.selected.val,
-            region: self.region.selected.val,
-            }
+        self.city.loadData(self.city, basepath, {
+          stateLocation: self.stateLocation.selected.val,
+          region: self.region.selected.val
         })
-        .then((resp) => {
-          let opts = self.toLabelVal(resp.data)
-
-          self.city.opts = opts
-          self.city.selected = opts[0]
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-      },
-
-      toLabelVal: function(idNameFormat) {
-        let ret = _.map(idNameFormat, (v) => {
-          return {val: v.id, label: v.name}
-        })
-        return ret
       }
     } // / methods
   }
