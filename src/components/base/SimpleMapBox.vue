@@ -1,6 +1,6 @@
 <template>
   <div class="box box-default">
-    <l-map style="min-height: 50vh" :zoom="zoom" :center="center">
+    <l-map style="min-height: 50vh" :zoom="zoom" :center="center" ref="leafletMap">
       <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
       <LGeoJson :geojson="geojson.data" :options="geojson.options" :visible="geojson.visible"></LGeoJson>
     </l-map>
@@ -10,6 +10,7 @@
 <script>
   import "leaflet/dist/leaflet.css"
   import { LMap, LTileLayer, LMarker, LGeoJson } from 'vue2-leaflet';
+  // import LControlLegend from '@/components/base/leaflet/LControlLegend'
 
   const axios = require('axios')
   const usStatesUrl = "https://api.myjson.com/bins/qv384"
@@ -40,8 +41,35 @@
     },
     mounted() {
       this.loadGeoJson(this, usStatesUrl)
+      this.loadLegend(this)
     },
     methods: {
+      loadLegend: (self) => {
+        let mapObject = self.$refs.leafletMap.mapObject
+        let legend = L.control({position: 'bottomright'})
+
+        legend.onAdd = function (map) {
+          var div = L.DomUtil.create('div', 'leaflet-info leaflet-legend'),
+            grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+            labels = [],
+            from, to;
+
+          for (var i = 0; i < grades.length; i++) {
+            from = grades[i]
+            to = grades[i + 1]
+
+            labels.push(
+              '<i style="background:' + self.getColor(from + 1) + '"></i> ' +
+              from + (to ? '&ndash;' + to : '+'))
+          }
+
+          div.innerHTML = labels.join('<br>')
+          return div
+        }
+        legend.addTo(mapObject)
+
+        return true;
+      },
       loadGeoJson: (self, dataUrl) => {
         axios.get(dataUrl)
           .then((resp) => {
@@ -78,3 +106,9 @@
   }
 </script>
 
+<style>
+/* #map { width: 800px; height: 500px; } */
+.leaflet-info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
+.leaflet-legend { text-align: left; line-height: 18px; color: #555; } 
+.leaflet-legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+</style>
