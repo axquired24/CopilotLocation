@@ -27,12 +27,6 @@
       }
     },
     methods: {
-      cobaLagi: (self) => {
-        console.log(this)
-        console.log(self)
-        // console.log(self.opts)
-        // console.log(self.selected)
-      },
       loadData: (self, apiUrl, params) => {
         axios.get(apiUrl, {
           params: params

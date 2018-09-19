@@ -1,6 +1,6 @@
 <template>
   <div class="box box-default">
-    <l-map style="min-height: 50vh" :zoom="zoom" :center="center" ref="leafletMap">
+    <l-map style="min-height: 50vh" :zoom="zoom" :center="center" :options="mapOptions" ref="leafletMap">
       <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
       <LGeoJson :geojson="geojson.data" :options="geojson.options" :visible="geojson.visible" ref="leafletGeojson"></LGeoJson>
     </l-map>
@@ -9,6 +9,11 @@
 
 <script>
   import "leaflet/dist/leaflet.css"
+  import "leaflet-loading/src/Control.Loading.css"
+  import "leaflet-loading/src/Control.Loading.js"
+  import "../../../static/js/plugins/spin/spin.min.js"
+  import "leaflet-spin/leaflet.spin.min.js"
+
   import { LMap, LTileLayer, LMarker, LGeoJson } from 'vue2-leaflet';
 
   const axios = require('axios')
@@ -29,6 +34,10 @@
         center: L.latLng(37.8, -96),
         url:'https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
         attribution:'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        mapOptions: {
+          // Set True to Tell the map to use a loading control | for tile map
+          loadingControl: false
+        },
         geojson: {
           data: null,
           options: {
@@ -77,14 +86,19 @@
         return true;
       },
       loadGeoJson: (self, dataUrl) => {
+        let mapObject = self.$refs.leafletMap.mapObject
+        mapObject.spin(true)
+        self.geojson.visible = false
         axios.get(dataUrl)
           .then((resp) => {
             let geojson = resp.data
             self.geojson.data = geojson
             self.geojson.visible = true
+            mapObject.spin(false)
           })
           .catch((err) => {
             console.log(err)
+            mapObject.spin(false)
           })
       },
       resetHighlight: (e, self) => {
