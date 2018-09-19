@@ -83,10 +83,10 @@
       //       : 'Hover over a state')
       //   }
 
-      //   lfInfo.onAdd = (map) => {
+      //   lfInfo.onAdd = (e, mapObject) => {
+      //     console.log(this)
       //     this._div = L.DomUtil.create('div', 'leaflet-info')
       //     // this.update()
-      //     console.log(lfInfo)
       //     return this._div
       //   }
 
@@ -124,9 +124,20 @@
         }
         // info.update(layer.feature.properties)
       },
+      showTooltip: (layer, self) => {
+        let mapObject = self.$refs.leafletMap.mapObject
+        let properties = layer.feature.properties
+        let textProps = "Name: " + properties.name + "<br> Density: " + properties.density
+        layer.bindTooltip(textProps, { sticky: true, interactive: true })
+      },
       onEachFeature: (feature, layer, self) => {
+        // bind tooltip on layer
+        self.showTooltip(layer, self)
+
         layer.on({
-          mouseover: (e) => { return self.highlightFeature(e, self) },
+          mouseover: (e) => {
+              self.highlightFeature(e, self)
+            },
           mouseout: (e) => { return self.resetHighlight(e, self) }
           // click: zoomToFeature
         });
