@@ -2,7 +2,7 @@
   <div class="box box-default">
     <l-map style="min-height: 50vh" :zoom="zoom" :center="center" ref="leafletMap">
       <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-      <LGeoJson :geojson="geojson.data" :options="geojson.options" :visible="geojson.visible"></LGeoJson>
+      <LGeoJson :geojson="geojson.data" :options="geojson.options" :visible="geojson.visible" ref="leafletGeojson"></LGeoJson>
     </l-map>
   </div>
 </template>
@@ -33,13 +33,15 @@
         geojson: {
           data: null,
           options: {
-            style: (feature) => { return this.polygonStyle(feature, this) }
+            style: (feature) => { return this.polygonStyle(feature, this) },
+            onEachFeature: (feature, layer) => {return this.onEachFeature(feature, layer, this)}
           },
           visible: false
         }
       }
     },
     mounted() {
+      // this.loadInfoBox(this)
       this.loadGeoJson(this, usStatesUrl)
       this.loadLegend(this)
     },
@@ -48,7 +50,7 @@
         let mapObject = self.$refs.leafletMap.mapObject
         let legend = L.control({position: 'bottomright'})
 
-        legend.onAdd = function (map) {
+        legend.onAdd = (map) => {
           var div = L.DomUtil.create('div', 'leaflet-info leaflet-legend'),
             grades = [0, 10, 20, 50, 100, 200, 500, 1000],
             labels = [],
@@ -67,9 +69,31 @@
           return div
         }
         legend.addTo(mapObject)
-
         return true;
       },
+      // loadInfoBox: (self) => {
+      //   let thisLeaflet = self.$refs.leafletMap
+      //   let mapObject = thisLeaflet.mapObject
+      //   // console.log(thisLeaflet.mapObject)
+      //   let lfInfo = L.control({position: 'topright'})
+
+      //   lfInfo.update = (leafletProps) => {
+      //     this._div.innerHTML = '<h4>US Population Density</h4>' +  (leafletProps ?
+      //       '<b>' + leafletProps.name + '</b><br />' + leafletProps.density + ' people / mi<sup>2</sup>'
+      //       : 'Hover over a state')
+      //   }
+
+      //   lfInfo.onAdd = (map) => {
+      //     this._div = L.DomUtil.create('div', 'leaflet-info')
+      //     // this.update()
+      //     console.log(lfInfo)
+      //     return this._div
+      //   }
+
+      //   lfInfo.addTo(mapObject)
+
+      //   return true
+      // },
       loadGeoJson: (self, dataUrl) => {
         axios.get(dataUrl)
           .then((resp) => {
@@ -80,6 +104,32 @@
           .catch((err) => {
             console.log(err)
           })
+      },
+      resetHighlight: (e, self) => {
+        let geojson = self.$refs.leafletGeojson.mapObject
+        geojson.resetStyle(e.target)
+		    //info.update()
+      },
+      highlightFeature: (e, self) => {
+        let layer = e.target;
+        layer.setStyle({
+          weight: 5,
+          color: '#666',
+          dashArray: '',
+          fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+        }
+        // info.update(layer.feature.properties)
+      },
+      onEachFeature: (feature, layer, self) => {
+        layer.on({
+          mouseover: (e) => { return self.highlightFeature(e, self) },
+          mouseout: (e) => { return self.resetHighlight(e, self) }
+          // click: zoomToFeature
+        });
       },
       getColor: (d) => {
         return d > 1000 ? '#800026' :
