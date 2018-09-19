@@ -7,6 +7,7 @@
           <BaseSelect title="State" ref="StateFilter"></BaseSelect>
           <BaseSelect title="Region" ref="RegionFilter"></BaseSelect>
           <BaseSelect title="City" ref="CityFilter"></BaseSelect>
+          <button type="button" class="btn btn-flat btn-danger" @click="$root.$emit(doSubmit)"><i class="fa fa-search"></i>&nbsp; Search</button>
       </div>
   </div>
 </template>
@@ -34,6 +35,11 @@
         stateLocation: defaultOptionObj,
         region: defaultOptionObj,
         city: defaultOptionObj
+      }
+    },
+    props: {
+      doSubmit: {
+        type: String
       }
     },
     mounted() {

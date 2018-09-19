@@ -25,7 +25,7 @@
     },
     data () {
       return {
-        zoom:4,
+        zoom: 4,
         center: L.latLng(37.8, -96),
         url:'https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
         attribution:'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -40,10 +40,17 @@
       }
     },
     mounted() {
+      this.loadMapBackground(this, 37.8, -96, 3)
       this.loadGeoJson(this, usStatesUrl)
       this.loadLegend(this)
     },
     methods: {
+      loadMapBackground: (self, lat, lng, zoom) => {
+        let mapObject = self.$refs.leafletMap.mapObject
+        self.center = L.latLng(lat, lng)
+        self.zoom = zoom
+        mapObject.setView(self.center, self.zoom)
+      },
       loadLegend: (self) => {
         let mapObject = self.$refs.leafletMap.mapObject
         let legend = L.control({position: 'bottomright'})
