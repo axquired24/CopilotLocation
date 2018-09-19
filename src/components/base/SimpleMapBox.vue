@@ -10,7 +10,6 @@
 <script>
   import "leaflet/dist/leaflet.css"
   import { LMap, LTileLayer, LMarker, LGeoJson } from 'vue2-leaflet';
-  // import LControlLegend from '@/components/base/leaflet/LControlLegend'
 
   const axios = require('axios')
   const usStatesUrl = "https://api.myjson.com/bins/qv384"
@@ -41,7 +40,6 @@
       }
     },
     mounted() {
-      // this.loadInfoBox(this)
       this.loadGeoJson(this, usStatesUrl)
       this.loadLegend(this)
     },
@@ -71,29 +69,6 @@
         legend.addTo(mapObject)
         return true;
       },
-      // loadInfoBox: (self) => {
-      //   let thisLeaflet = self.$refs.leafletMap
-      //   let mapObject = thisLeaflet.mapObject
-      //   // console.log(thisLeaflet.mapObject)
-      //   let lfInfo = L.control({position: 'topright'})
-
-      //   lfInfo.update = (leafletProps) => {
-      //     this._div.innerHTML = '<h4>US Population Density</h4>' +  (leafletProps ?
-      //       '<b>' + leafletProps.name + '</b><br />' + leafletProps.density + ' people / mi<sup>2</sup>'
-      //       : 'Hover over a state')
-      //   }
-
-      //   lfInfo.onAdd = (e, mapObject) => {
-      //     console.log(this)
-      //     this._div = L.DomUtil.create('div', 'leaflet-info')
-      //     // this.update()
-      //     return this._div
-      //   }
-
-      //   lfInfo.addTo(mapObject)
-
-      //   return true
-      // },
       loadGeoJson: (self, dataUrl) => {
         axios.get(dataUrl)
           .then((resp) => {
@@ -127,11 +102,11 @@
       showTooltip: (layer, self) => {
         let mapObject = self.$refs.leafletMap.mapObject
         let properties = layer.feature.properties
-        let textProps = "Name: " + properties.name + "<br> Density: " + properties.density
+        let textProps = '<div class="tooltip-leaflet"> <h3>Details</h3> <span>Location Name: '+properties.name+'</span> <small>Density: '+properties.density+'</small> </div>'
         layer.bindTooltip(textProps, { sticky: true, interactive: true })
       },
       onEachFeature: (feature, layer, self) => {
-        // bind tooltip on layer
+        // bind tooltip on
         self.showTooltip(layer, self)
 
         layer.on({
@@ -167,9 +142,25 @@
   }
 </script>
 
-<style>
+<style lang='less'>
 /* #map { width: 800px; height: 500px; } */
 .leaflet-info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
 .leaflet-legend { text-align: left; line-height: 18px; color: #555; } 
 .leaflet-legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+
+.tooltip-leaflet {
+  min-width: 200px;
+
+  h3 {
+    color: darkblue;
+    margin-top:0;
+    padding-bottom: 10px;
+    border-bottom: #CCC 1px solid;
+  }
+
+  span, small {
+    font-size: 14px;
+    display: block;
+  }
+}
 </style>
